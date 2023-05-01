@@ -1,0 +1,46 @@
+import sqlite3
+import random
+
+# Opret forbindelse til databasen og opret en tabel
+conn = sqlite3.connect('temperatur.db')
+c = conn.cursor()
+c.execute('''CREATE TABLE temperature (
+             id INTEGER PRIMARY KEY,
+             city TEXT,
+             temperature REAL,
+             timestamp DATETIME DEFAULT CURRENT_TIMESTAMP)''')
+
+# Generer målinger for 50 byer
+cities = ['Aarhus', 'Copenhagen', 'Berlin', 'Paris', 'London', 'New York', 'Tokyo', 'Sydney', 'Rio de Janeiro', 'Cape Town']
+for i in range(10000):
+    for city in cities:
+        # Generer en temperatur mellem -20 og 40 grader
+        temperature = round(random.uniform(-20, 40), 1)
+        # Indsæt målingen i databasen
+        c.execute("INSERT INTO temperature (city, temperature) VALUES (?, ?)", (city, temperature))
+    conn.commit()
+
+# Udskriv alle temperaturer for Aarhus
+print("Temperaturer for Aarhus:")
+c.execute("SELECT temperature, timestamp FROM temperature WHERE city='Aarhus'")
+for row in c.fetchall():
+    print(row)
+
+# Udskriv de 10 koldeste og varmeste byer og deres temperaturer
+print("\nDe 10 koldeste og varmeste byer:")
+c.execute("SELECT city, temperature FROM temperature ORDER BY temperature ASC LIMIT 10")
+print("Koldeste:")
+for row in c.fetchall():
+    print(row)
+c.execute("SELECT city, temperature FROM temperature ORDER BY temperature DESC LIMIT 10")
+print("Varmeste:")
+for row in c.fetchall():
+    print(row)
+
+# Udskriv sidste måling
+print("\nSidste måling:")
+c.execute("SELECT * FROM temperature ORDER BY id DESC LIMIT 1")
+print(c.fetchone())
+
+# Luk forbindelsen til databasen
+conn.close()

@@ -1,0 +1,40 @@
+import random
+import datetime
+import sqlite3
+
+# Connect to the database
+conn = sqlite3.connect('game.db')
+
+# Create a table to store the game logs
+conn.execute('''CREATE TABLE IF NOT EXISTS game_logs
+             (player_name TEXT, guess INT, guess_time TEXT, is_correct INT)''')
+
+def guess_number(player_name):
+    number = random.randint(1, 100)
+    guess = 0
+    count = 0
+    
+    while guess != number:
+        guess = int(input("Guess a number between 1 and 100: "))
+        count += 1
+        guess_time = str(datetime.datetime.now())
+
+        if guess < number:
+            print("Too low!")
+            conn.execute("INSERT INTO game_logs (player_name, guess, guess_time, is_correct) VALUES (?, ?, ?, 0)", (player_name, guess, guess_time))
+            conn.commit()
+        elif guess > number:
+            print("Too high!")
+            conn.execute("INSERT INTO game_logs (player_name, guess, guess_time, is_correct) VALUES (?, ?, ?, 0)", (player_name, guess, guess_time))
+            conn.commit()
+        else:
+            print("You got it in", count, "guesses!")
+            conn.execute("INSERT INTO game_logs (player_name, guess, guess_time, is_correct) VALUES (?, ?, ?, 1)", (player_name, guess, guess_time))
+            conn.commit()
+
+# Start the game
+player_name = input("Enter your name: ")
+guess_number(player_name)
+
+# Close the database connection
+conn.close()

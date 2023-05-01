@@ -1,0 +1,25 @@
+CREATE TABLE players (
+    id INTEGER PRIMARY KEY,
+    name TEXT,
+    score INTEGER,
+    level INTEGER
+);
+
+CREATE TABLE games (
+    id INTEGER PRIMARY KEY,
+    player_id INTEGER,
+    start_time DATETIME,
+    end_time DATETIME,
+    status TEXT,
+    FOREIGN KEY(player_id) REFERENCES players(id)
+);
+
+CREATE TABLE game_events (
+    id INTEGER PRIMARY KEY,
+    game_id INTEGER,
+    event_type TEXT,
+    event_time DATETIME,
+    event_data TEXT,
+    FOREIGN KEY(game_id) REFERENCES games(id)
+);
+
